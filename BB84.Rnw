@@ -8,7 +8,7 @@
 % regua.
 %-------------------------------------------------------------------------------
 \title{Adentrando o admir\'avel mundo novo.}
-\author{Paulo Freitas Gomes}
+\author{Paulo Freitas Gomes, Wendel Lopes Moreira}
 %-------------------------------------------------------------------------------
 \begin{document}
 \SweaveOpts{concordance=TRUE}
