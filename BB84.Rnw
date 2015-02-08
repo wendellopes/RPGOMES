@@ -1,0 +1,208 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage[brazil]{babel}
+\renewcommand\familydefault{\sfdefault}
+%-------------------------------------------------------------------------------
+% O bom uso recomenda nao exceder os 80 caracteres. Use estas linhas como 
+% regua.
+%-------------------------------------------------------------------------------
+\title{Adentrando o admir\'avel mundo novo.}
+\author{Paulo Freitas Gomes}
+%-------------------------------------------------------------------------------
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\onehalfspacing
+\maketitle
+%-------------------------------------------------------------------------------
+\tableofcontents
+%-------------------------------------------------------------------------------
+\section{Primeiros passos}
+%-------------------------------------------------------------------------------
+Primeiramente vamos limpar o ambiente, e vamos também verificar o tempo
+de execução do arquivo.
+<<results=hide>>=
+rm(list=ls())     # Environment Cleaning
+#Atencao, abrir todos os arquivos no linux e depois salvar.
+#t1 = proc.time();
+t1<-proc.time();
+
+#print(c('Comecando a execucao do programa.'))
+#print('Comecando a execucao do programa') # c == concatenar vetores
+cat('Comecando a execucao do programa\n')  # cat == imprimir texto
+@
+No bloco acima o resultados foram omitidos. Logo abaixo vamos executar o 
+programa.
+%-------------------------------------------------------------------------------
+\section{Eva não vê os dados}
+%-------------------------------------------------------------------------------
+%<<results=hide>>=
+<<>>=
+N <- 10
+bitsalice <- sample(0:1, N,TRUE)
+#base da alice
+basealice <- sample(0:1, N,TRUE)
+#base do bob
+basebob <- sample(0:1, N,TRUE)
+bitsbob <- sample(0:1, N,TRUE)
+#bitscertos  <- matrix(2,1,N)
+bitscertos <- rep(2,N) # Repeat 
+@
+Acima foram definidas as bases e mais algumas coisas. 
+As bases são dadas por
+%No código abaixo o W01 é tipo um label, que pode ser chamado depois, por
+%algum motivo.
+<<W01>>=
+print(data.frame(basealice,basebob))
+@
+Agora vamos fazer os cálculos, que não serão mostrados.
+<<echo=FALSE>>=
+j1 <- 1
+n1 <- 0
+for (i1 in 1:N) {
+  if (basealice[i1] == basebob[i1]) {
+    bitsbob[i1] <- bitsalice[i1];
+ #   n1 = n1+1   
+    bitscertos[j1] <- bitsalice[i1]
+    j1 <- j1+1
+    n1 <- n1 + 1
+ } #else bitsbob[i1] <- sample(0:1,1,TRUE)
+}
+
+bitscertos <- bitscertos[ bitscertos != 2 ]
+
+if (N <= 15 ) {
+  #print(c('Bases utilizadas: alice e depois bob.'))
+  cat('Bases utilizadas: alice e depois bob.\n')
+  print(basealice)
+  print(basebob)
+  cat('Bits: alice e depois bob.\n')
+  print(bitsalice)
+  print(bitsbob)
+  cat('Bits certos:\n')
+  print(bitscertos) 
+}
+@
+Agora queremos só os resultados, que são dados por:
+<<echo=FALSE>>=
+#print(c('Numero total de bits enviados pela Alice.'))
+#print(N)
+cat('Numero total de bits enviados pela Alice: ',N,"\n",sep="")
+
+#print(c('Numero de bits corretos lidos por Bob.'))
+#print(n1)
+cat('Numero de bits corretos lidos por Bob: ',n1,"\n",sep="")
+#print(c('Fracao dos bits lidos corretamente.'))
+#print(n1/N)
+#cat('Fracao dos bits lidos corretamente:',n1/N,"\n") # comparar com acima
+@
+A fração dos bits lidos corretamente é de \Sexpr{n1/N}, de modo que
+se esta fracao ficar proximo de 0.5, e uma evidencia de
+que Eva nao interceptou os dados.
+%-------------------------------------------------------------------------------
+\section{Eva intercepta os dados}
+%-------------------------------------------------------------------------------
+Considerando agora uma interceptacao da Eva
+% Para comentar um bloco Sweave usa-se o comentario do TeX.
+% Lembre-se, voce so vai entrar em R apos o <<>>=.
+% Antes disto, voce esta num documento TeX.
+%<<>>=
+%cat('Se esta fracao ficar proximo de 0.5, e uma evidencia de\n
+%que a Eva nao interceptou os dados.\n\n\n
+%Considerando agora uma interceptacao da Eva.\n')
+%@
+<<echo=FALSE>>=
+#base da eva
+baseeva <- sample(0:1, N,TRUE)
+bitseva <- sample(0:1, N,TRUE)
+bitseva2<-bitseva
+@
+Abaixo você utilizou um \emph{loop} para calcular. Em larga escala,
+não é recomendado.
+<<eval=FALSE>>=
+for (i2 in 1:N) if (basealice[i2] == baseeva[i2]) bitseva[i2] <- bitsalice[i2]
+   # else bitseva[i2] <- sample(0:1,1,TRUE)
+@
+Eu prefiro não escrever assim, é um purismo, mas é mais claro fazer assim
+<<eval=TRUE>>=
+for(i2 in 1:N){
+  if(basealice[i2] == baseeva[i2]){
+    bitseva[i2] <- bitsalice[i2]  
+  }
+}
+#}else{
+#  bitseva[i2] <- sample(0:1,1,TRUE)
+#} 
+@
+Em grande parte dos casos você pode fazer isto
+<<eval=FALSE>>=
+test <- basealice==baseeva
+bitseva2[test]<-bitsalice[test]
+@
+sendo que nem sempre é necessário escrever o test (apesar de uma redundância
+de cálculos.)
+<<eval=TRUE>>=
+bitseva2[basealice==baseeva]<-bitsalice[basealice==baseeva]
+@
+Comparando os resultados temos
+<<>>=
+print(bitseva)
+print(bitseva2)
+@
+Voltando a vaca fria
+%<<>>==
+%#print(c('Porem, a Eva nao sabe quais dados estao certos, 
+% pois ela nao sabe a base da %Alice.'))
+%cat('Porem, a Eva nao sabe quais dados estao certos, 
+% pois ela nao sabe a base da %Alice.\n')
+%@
+
+<<echo=FALSE>>=
+bits2bob <- sample(0:1, N,TRUE)
+for (i3 in 1:N) if (basebob[i3] == baseeva[i3]) bits2bob[i3] <- bitseva[i3]
+  #else bits2bob[i3] <- sample(0:1,1,TRUE)
+#print(c('Bob le os dados interceptados e depois enviados pela Eva.'))
+#cat('Bob le os dados interceptados e depois enviados pela Eva.\n')
+if (N <= 15 ) {
+  cat('Bases utilizadas: alice e depois bob.\n')
+  print(basealice)
+  print(basebob)
+  cat('Bits: alice e depois bob.\n')
+  print(bitsalice)
+  print(bits2bob)
+}
+@
+
+<<echo=FALSE>>=
+n4 <- 0
+n5 <- 0
+for (i4 in 1:N) {
+  if (basealice[i4] == basebob[i4]) {
+  if (bitsalice[i4] == bits2bob[i4] ) n4 <- n4 + 1
+  else n5 <- n5 +1 }
+}
+cat('Numero de bits lido(s) corretamente por Bob:',n4,'\n')
+#print(n4)
+cat('Numero de bits lido(s) erroneamente por Bob:',n5,'\n')
+#print(n5)
+@
+Se houver pelo menos um bit lido erroneamente, fica provado que houve 
+interceptacao.
+
+
+%-------------------------------------------------------------------------------
+\section{Comparando os tempos}
+%-------------------------------------------------------------------------------
+<<echo=FALSE>>=
+tempo <-(proc.time()-t1)[3]
+s=sprintf('tempo = %g',tempo) # cheio das travessuras!
+cat('Fim',s)
+@
+%-------------------------------------------------------------------------------
+\section{Conclusões}
+Mostrei aqui o conceito de \emph{Reproducible document}, ou seja,
+teoria e cálculos vão no mesmo documento. Poderia ser um livro, apresentação ou
+poster. Não entrei no mérito das contas. 
+
+%-------------------------------------------------------------------------------
+\end{document}
