@@ -1,16 +1,38 @@
 rm(list=ls())     # Environment Cleaning
+#-------------------------------------------------------------------------------
+# OUTPUT ANGLES
+#-------------------------------------------------------------------------------
+DWk<-function(th,n,k){
+   ph<-asin(sin(th)/n)
+   return(2*th-k*(pi-2*ph))
+}
+DMk<-function(th,n,k){
+   ph<-asin(sin(th)/n)
+   return(2*(th-ph)-k*(pi-2*ph))
+}
+#-------------------------------------------------------------------------------
+# EXTREME ANGLES
+#-------------------------------------------------------------------------------
+DEXT<-function(l,n){
+   dn<-l*pi+2*asin(sqrt(((1+l)**2-n**2)/((1+l)**2-1)))-
+      2*(1+l)*asin(sqrt(((1+l)**2-n**2)/((1+l)**2-1))/n)
+   return(2*pi-dn)
+}
+#-------------------------------------------------------------------------------
 R<-1              # Radius of the drop
-n<-1.33           # Index of refraction
+n<-4/3            # Index of refraction
 tr<-.4            # Transparency of the rays
 nr<-3             # Number of output refracted rays
-f<-1              # Amplitude factor. Extends the rays by this value.
+f<-3              # Amplitude factor. Extends the rays by this value.
 # kj<-8           # Uncomment this to show only specified option
 # Incident impact factor  
 dp<-.005          # increment 
 pmin<--sin(pi/4)  # minimum value (-1+dp)
 pmax<-sin(pi/4)   # maximum value (1-dp)
 pj<-seq(pmin,pmax,dp) # Sequence or specific value(s).
-pj<-seq(.4,.8,.01)
+jj<-.7
+pj<-seq(jj,jj+.1,.01)
+pj<-c(pj,-pj)
 # Other choices
 reflec<-TRUE     # Show incident reflecion
 normal<-FALSE     # Show the normals
@@ -48,7 +70,7 @@ for(p in pj){
    so<-sin(2*(th))
    points(R*c(1+f,ct),R*c(st,st),type='l',col=rgb(0,0,1,tr))        # Incident beam
    if(reflec){
-      points(R*ct+c(0,co),R*st+c(0,so),type='l',col=rgb(0,1,0,tr))   # REFLEXAO
+      points(R*ct+f*c(0,co),R*st+f*c(0,so),type='l',col=rgb(0,1,0,tr))   # Reflection
    }
    #---------------------------------------
    cp<-ct
