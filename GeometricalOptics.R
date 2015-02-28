@@ -21,7 +21,7 @@ DEXT<-function(l,n){
 #-------------------------------------------------------------------------------
 R<-1              # Radius of the drop
 n<-4/3            # Index of refraction
-tr<-.4            # Transparency of the rays
+tr<-1            # Transparency of the rays
 nr<-3             # Number of output refracted rays
 f<-3              # Amplitude factor. Extends the rays by this value.
 # kj<-8           # Uncomment this to show only specified option
@@ -32,10 +32,11 @@ pmax<-sin(pi/4)   # maximum value (1-dp)
 pj<-seq(pmin,pmax,dp) # Sequence or specific value(s).
 jj<-.7
 pj<-seq(jj,jj+.1,.01)
+pj<-.7
 pj<-c(pj,-pj)
 # Other choices
 reflec<-TRUE     # Show incident reflecion
-normal<-FALSE     # Show the normals
+normal<-TRUE     # Show the normals
 ncheck<-FALSE     # Show outer circle to check normal
 angtst<-FALSE     # Set n=1 and p=sin(pi/nr), where nr=4,8,16,
 #-------------------------------------------------------------------------------
@@ -44,9 +45,12 @@ if(angtst){
    np<-ifelse(nr>2,nr,4)
    pj<-sin(pi/(np))
 }
-# Draw the drop
+#-------------------------------------------------------------------------------
+# DRAW
+#-------------------------------------------------------------------------------
+pdf("drop02.pdf")
 tt<-seq(0,2*pi,pi/199)
-plot(R*cos(tt),R*sin(tt),type='l',asp=1,xlim=2*R*c(-1,1));grid()      # Circle
+plot(R*cos(tt),R*sin(tt),type='l',asp=1,xlim=2*R*c(-1,1),xlab='',ylab='');grid()      # Circle
 # outer circle to check normals
 if(ncheck){
    points(f*R*cos(tt),f*R*sin(tt),type='l');        # Circle
@@ -96,3 +100,4 @@ for(p in pj){
    }
 }
 #---------------------------------------
+dev.off()
