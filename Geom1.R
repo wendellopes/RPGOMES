@@ -56,7 +56,7 @@ abline(h=0)
 legend("topright",c("ts","tp","rs","rp"),col=c("black","red","blue","green"),lty=1)
 #-------------------------------------------------------------------------------
 # Coeficientes, grafico polar
-x11()
+#x11()
 th<-seq(-pi,pi,dth/10)
 u<-snell(sin(th),n,amplitude=FALSE)
 plot(  u$ts*cbind(cos(th),sin(th)),type='l',lwd=2,ylim=c(-1,1),asp=1,xlab='',ylab='')

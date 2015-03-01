@@ -4,7 +4,7 @@
 # Angulos
 Dk<-function(th,n,k,reduce=TRUE){
    ph<-asin(sin(th)/n)
-   dk<-2*(th-ph)+k*(pi-2*ph)
+   dk<-th+(k+1)*(pi-2*ph)
    if(reduce){
       s<-sign(dk)
       dk<-abs(dk)%%(2*pi)
@@ -48,8 +48,10 @@ Tsk<-function(th,n,k){
 ko<-1
 dth<-pi/600
 th<-seq(-pi/2,pi/2,dth)
-u1<-Pk(th,4/3,ko,reduce=TRUE)
-u2<-Pk(th,4/3,ko+1,reduce=TRUE)
+P1<-Pk(th,4/3,ko,reduce=TRUE)
+P2<-Pk(th,4/3,ko+1,reduce=TRUE)
+D1<-Dk(th,4/3,ko,reduce=TRUE)
+D2<-Dk(th,4/3,ko+1,reduce=TRUE)
 # Angles
 uk1<-DkE(4/3,ko  )
 uk2<-DkE(4/3,ko+1)
@@ -58,14 +60,18 @@ tk2<-Pk(uk2,4/3,ko+1)
 #-------------------------------------------------------------------------------
 # DRAW
 #-------------------------------------------------------------------------------
-pdf("Pk.pdf")
-plot(  sin(th),u1*180/pi,type='l',ylim=range(180*c(-1,1)),
+#pdf("Pk.pdf")
+plot(  sin(th),P1*180/pi,type='l',lwd=2,ylim=range(180*c(-1,1)),
        xlab="Impact Parameter",ylab=expression(Theta_k))
-points(sin(th),u2*180/pi,type='l',col='red')
-legend("topleft",c("P1","P2"),col=c("black","red"),lty=1)
+points(sin(th),P2*180/pi,type='l',lwd=2,col='red')
+points(sin(th),D1*180/pi,type='l',lwd=2,col='blue')
+points(sin(th),D2*180/pi,type='l',lwd=2,col='green')
+#legend("topleft",c("T1","T2","P1","P2"),col=c("black","red","blue","green"),lty=1)
+legend("bottomleft",c("P1","P2"),col=c("blue","green"),lty=1,lwd=2)
+legend("topright",c("T1","T2"),col=c("black","red"),lty=1,lwd=2)
 abline(h=tk1*180/pi)
 abline(h=tk2*180/pi,col='red')
-dev.off()
+#dev.off()
 #-------------------------------------------------------------------------------
 # REFLECTION COEFFICIENTS
 #-------------------------------------------------------------------------------

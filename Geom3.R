@@ -9,26 +9,28 @@ PiReduce<-function(th){
    th<-s*th
    return(th)
 }
-Dk<-function(th,n,k,reduce=TRUE){
+Phi.k<-function(th,n,k,reduce=TRUE){
    ph<-asin(sin(th)/n)
-   dk<-2*(th-ph)+k*(pi-2*ph)
+   dk<-
+   dk<-th+(k+1)*(pi-2*ph)
    if(reduce){
       dk<-PiReduce(dk)
    }
    return(dk)
 }
-Pk<-function(th,n,k,reduce=TRUE){
+Theta.k<-function(th,n,k,reduce=TRUE){
    ph<-asin(sin(th)/n)
-   pk<-2*th+(k+1)*(pi-2*ph)
+   Tk<-2*th+(k+1)*(pi-2*ph)
    if(reduce){
-      pk<-PiReduce(pk)
+      Tk<-PiReduce(Tk)
    }
-   return(pk)
+   return(Tk)
 }
 #-------------------------------------------------------------------------------
-DkE<-function(n,k){
-   dke<-acos(sqrt((n**2-1)/(k*(k+2))))
-   return(dke*c(-1,1))
+AngExtreme<-function(n,k,j=2){
+   u<-(2/j)*(k+1)
+   dke<-acos(sqrt((n**2-1)/(u**2-1)
+   return(dke)
 }
 #-------------------------------------------------------------------------------
 # REFLECTION COEFFICIENTS
@@ -37,44 +39,50 @@ Rpk<-function(th,n,k){
    ph<-asin(sin(th)/n)
    r<-ifelse((abs(th)%%pi)<0.01,(n-1)/(n+1),sin(th-ph)/sin(th+ph))
    r<-r**2
-   rpk<-((1-r)**2)*(r**k)
-   return(rpk)
+   Rpk<-((1-r)**2)*(r**k)
+   return(Rpk)
 }
 Rsk<-function(th,n,k){
    ph<-asin(sin(th)/n)
    r<-ifelse((abs(th)%%pi)<0.01,(n-1)/(n+1),tan(th-ph)/tan(th+ph))
    r<-r**2
-   rpk<-((1-r)**2)*(r**k)
-   return(rpk)
+   Rpk<-((1-r)**2)*(r**k)
+   return(Rpk)
 }
 #-------------------------------------------------------------------------------
 # GEOMETRICAL FACTOR
 #-------------------------------------------------------------------------------
-dDk<-function(th,n,k){
-   ph<-asin(sin(th)/n)
-   ft<-ifelse(abs(th)<.01,1/n,tan(ph)/tan(th))
-   ddk<-2-2*(k+1)*ft
+dTheta.dtheta<-function(th,n,k,j=2){
+   u<-sin(th)
+   ft<-sqrt((1-u**2)/(n**2-u**2))
+   ddk<-j-2*(k+1)*ft
    return(ddk)
 }
 #-------------------------------------------------------------------------------
-Ek<-function(th,n,k,pol='b'){
+GeometricalFactor<-function(th,n,k,pol='b',dtheta=TRUE,Fresnel=TRUE,j=2){
+   # Check the polarizations
    if(!(pol%in%c('s','p','b'))){
       stop("Polarization must be parallel (p), perpendicular (s) or both (b)")
    }
-   de<-1
-   de<-1/dDk(th,n,k)
+   # Take into acount the (d\Theta/d\theta)^{-1} factor
+   if(dtheta){
+      de<-1/dTheta.dtheta(th,n,k,j)
+   }else{
+      de<-1
+   }
    # reduce th to 0:2*pi
    th<-PiReduce(th)
    # values for th=0 and th=pi 
    c0<--((-1)^k)/(1-(k+1)/n)
    c1<--((-1)^k)/(1+(k+1)/n)
-   # Limit
-   L0<-0.01
+   # Limits 
+   L0<-0.001
    ft<-ifelse(abs(th) < L0,
          c0,
          ifelse(abs(abs(th)-pi) < L0,
             c1,
-            sin(2*th)/sin(Pk(th,n,k))))
+            sin(2*th)/sin(Tk(th,n,k))))
+   # Reflectivity and polarization
    if(pol=='b'){
       ek<-.5*(Rpk(th,n,k)+Rsk(th,n,k))
    }else{
@@ -84,8 +92,12 @@ Ek<-function(th,n,k,pol='b'){
          ek<-.5*Rpk(th,n,k)
       }
    }
-   ek<-ft*de*ek
-   return(abs(ek))
+   if(Fresnel){
+      ek<-ft*de*ek
+   }else{
+      ek<-ft*de
+   }
+   return(ek)
 }
 #-------------------------------------------------------------------------------
 ko<-1
@@ -94,11 +106,11 @@ th<-seq(-pi/2,pi/2,dth)
 #-------------------------------------------------------------------------------
 uk1<-DkE(4/3,ko  )
 uk2<-DkE(4/3,ko+1)
-tk1<-Pk(uk1,4/3,ko  )
-tk2<-Pk(uk2,4/3,ko+1)
+tk1<-Tk(uk1,4/3,ko  )
+tk2<-Tk(uk2,4/3,ko+1)
 #-------------------------------------------------------------------------------
-TH1<-Pk(th,4/3,ko  )
-TH2<-Pk(th,4/3,ko+1)
+TH1<-Tk(th,4/3,ko  )
+TH2<-Tk(th,4/3,ko+1)
 #-------------------------------------------------------------------------------
 u1<-Rpk(th,4/3,ko  )
 u2<-Rpk(th,4/3,ko+1)
@@ -123,7 +135,7 @@ ek2s<-Ek(th,4/3,ko+1,pol='s')
 #-------------------------------------------------------------------------------
 # LINEAR PLOT
 #-------------------------------------------------------------------------------
-x11()
+#x11()
 #pdf("Intensity.pdf")
 plot(  TH1*180/pi,ek1b,pch=1,type='p',cex=.5,log='y',xlim=180*c(-1,1),
    ylim=c(1e-5,10),xlab="Emerging angle",ylab="Intensity")
@@ -145,7 +157,7 @@ legend("topright",c("b1","b2","p1","p2","s1","s2"),
 #-------------------------------------------------------------------------------
 # POLAR PLOT
 #-------------------------------------------------------------------------------
-pdf("PFZ.pdf")
+#pdf("PFZ.pdf")
 #x11()
 r<-.2
 plot  (cbind(c1,s1)*ek1b,type='l',lwd=2,xlim=r*c(-1,1),asp=1,ylim=r*c(-1,1),xlab='',ylab='')
@@ -181,4 +193,4 @@ legend("topleft",c("(Tp1+Ts1) S1","(Tp2+Ts2) S2","Tp1 S1","Tp2 S2","Ts1 S1","Ts2
               col=c("black","red","green","cyan","blue","magenta"),
               lty=1)#,pch=c(1,1,3,3,4,4))
 #-------------------------------------------------------------------------------
-dev.off()
+#dev.off()

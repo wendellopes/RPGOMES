@@ -1,0 +1,529 @@
+% ****** Start of file aipsamp.tex ******
+%
+%   This file is part of the AIP files in the AIP distribution for REVTeX 4.
+%   Version 4.1 of REVTeX, October 2009
+%
+%   Copyright (c) 2009 American Institute of Physics.
+%
+%   See the AIP README file for restrictions and more information.
+%
+% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
+% as well as the rest of the prerequisites for REVTeX 4.1
+%
+% It also requires running BibTeX. The commands are as follows:
+%
+%  1)  latex  aipsamp
+%  2)  bibtex aipsamp
+%  3)  latex  aipsamp
+%  4)  latex  aipsamp
+%
+% Use this file as a source of example code for your aip document.
+% Use the file aiptemplate.tex as a template for your document.
+\documentclass[%
+ aip,
+ jmp,%
+ amsmath,amssymb,
+%preprint,%
+ reprint,%
+%author-year,%
+%author-numerical,%
+]{revtex4-1}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+\usepackage{listings} % package para escrever codigo no texto
+
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=R,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+%-------------------------------------------------------------------------------
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+%-------------------------------------------------------------------------------
+\preprint{AIP/123-QED}
+\title[Rainbow]{Rainbow: computational implementation of its physical laws}
+% Force line breaks with \\
+%\thanks{Footnote to title of article.}
+\author{R. S. Grisotto}
+ \affiliation{Instituto de Ci\^encias Exatas, Regional Jata\'i, 
+Universidade Federal de Goi\'as, Jata\'i Brasil.}
+\author{P. F. Gomes}
+\affiliation{Instituto de Ci\^encias Exatas, Regional Jata\'i, 
+Universidade Federal de Goi\'as, Jata\'i Brasil.}
+\author{W. L. Moreira}
+\affiliation{ Peroba}
+\date{\today}
+%-------------------------------------------------------------------------------
+\begin{abstract}
+Rainbow is a beautiful phenomenon which happens when water is falling against 
+sunshines. Usually, rainbows are visible during rains. In this work, we will 
+study the physical laws describing many optical effects seen in our sky. 
+We start with the rainbow.
+
+To visualize how the laws of physics work together to create many atmospherical 
+phenomena, we will use an open-source platform to computationally implement all 
+the calculus: R project. 
+
+%
+Valid PACS numbers may be entered using the \verb+\pacs{#1}+ command.
+\end{abstract}
+%-------------------------------------------------------------------------------
+\pacs{Valid PACS appear here}% PACS, the Physics and Astronomy
+                             % Classification Scheme.
+\keywords{rainbow, optics, R-project, simulation, numerical}
+\maketitle
+%-------------------------------------------------------------------------------
+\section{Introduction}
+%-------------------------------------------------------------------------------
+The rainbow is the physical phenomenum seen in figure~\ref{fig:jatai}
+\begin{figure}[h!]\label{fig:jatai}
+\centering
+\includegraphics[width=2.9 in]{IMG_2258b.JPG}
+\caption{Rainbow seen at the city of Jata\'i, Brazil.}
+\label{export}
+\end{figure}
+We will treat the mathematical models in the the way to model this phenomenum.
+%-------------------------------------------------------------------------------
+\section{Geometrical Optics}
+%-------------------------------------------------------------------------------
+In order to facilitate the comprehension, let's make some definitions: at first,
+we will treat a single
+spherical water droplet with radius $a$, and a system of reference centered at 
+the droplet. The index of refraction
+of the outer medium is considered one the inner medium has a index of refraction
+$n$.
+We define a impact parameter as:
+\begin{equation}
+p = a\sin \theta.
+\end{equation}
+where $\theta$ is the angle between the normal and the $x$ axis (see figure 
+\ref{fig:drop01}). We consider the rays coming parallel to the $x$, reaching 
+the droplet and refracting in an angle $\phi$.
+Using the Snell law, we find that
+\begin{equation}
+\sin\phi= \sin \theta/n \label{eqphitheta}
+\end{equation}
+We define the angle $D_k$ as the deviation angle between the incoming ray and 
+the emerging one after $k$ internal reflections. In the figure \ref{fig:drop01}
+it is shown the $k=1$ case. We can also calculate
+the angle $\Psi_k$ as the angle of the ray will leave the droplet, in our 
+reference system.
+
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{drop01b.pdf}
+\caption{Reference system, incoming and outcome rays}
+\label{fig:drop01}
+\end{figure}
+%-------------------------------------------------------------------------------
+
+It's easy to see the deviation of the rays is given by
+\begin{eqnarray}
+D_k &=& 2(\theta - \phi)+k(\pi - 2\phi)\label{eqD1}
+\end{eqnarray}
+where $k$ means the number of internal reflections. Setting $k=0$ means the 
+first refracted ray,
+with no internal reflection. It's important to know that we can have rays 
+reaching in the two
+hemispheres, so the impact parameter must have positive and negative values, 
+as shown in
+figure~\ref{fig:drop02}. Understanding this we can interpret 
+figure~\ref{fig:Pk}, where
+we can see that the first two rainbows come each one from one hemisphere.
+
+\subsection{Critical angles}
+
+In order to better understand the situation, we prefer to use the internal 
+reflection 
+angle $\Phi_k$ (which is the angle of the normal) and the emergency angle 
+$\Theta_k$
+\begin{eqnarray}
+\Phi_k   &=&  \theta+(k+1)(\pi - 2\phi)\\\label{eq:Phk}
+\Theta_k &=& 2\theta+(k+1)(\pi - 2\phi),\label{eq:Thk}
+\end{eqnarray}
+which is the angle in the reference system of the sphere (see figure 
+\ref{fig:drop01} for the $k=1$ case of this angles). It's easy to see 
+that $D_k=\Theta_{k}-\pi$. To understant the main difference
+between the two angles $D_k$ and $\Theta_k$, we have to imagine a
+sphere with index of refraction equal to one, so the ray suffers no deviation 
+in its trajectory. But, in the reference of the sphere, the incoming ray has an
+angle of $0$ and the outgoing ray has an angle of $\pi$.
+
+
+This way we can see that
+the incoming ray will reach the sphere with an angle $\theta$, at positions
+$x_0=a\cos\theta$ and $y_0=a\sin\theta$, will be reflected at the same point
+with an angle $2\theta$, will refract and enter the sphere with an
+angle $\phi$ obeying the Snell law $n\sin\phi=\sin\theta$. So, it'll
+be reflected at positions given by $x_i=a\cos\Phi_i$ and $y_i=a\sin\Phi_i$,
+and will leave the sphere at this positions with an angle $\Theta_k$.
+
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{drop02.pdf}
+\caption{Reference system, incoming and outcome rays, for simetric impact 
+parameters $p$ and $-p$.}
+\label{fig:drop02}
+\end{figure}
+%-------------------------------------------------------------------------------
+
+Isolating $\phi$ from eq. \ref{eqphitheta} and substituing the result on 
+eq. \ref{eq:Thk}, we have:
+\begin{equation}
+\Theta_k=
+2\theta+(k+1)\left[\pi-2\arcsin \left(\dfrac{\sin\theta}{n}\right)\right]
+\end{equation}
+The question is: is there a maximum or a mínimum in the function 
+$\Theta_k (\theta)$? One can immediatly see that we have an optimal value. 
+Calculating the derivative we can find out
+that the crical angles are given by
+\begin{eqnarray}
+\cos\theta_k^*=\sqrt{\frac{n^2-1}{k(k+2)}}
+\end{eqnarray}
+We can see in figure~\ref{fig:Pk} there's no value of $p$ that give certain 
+values of $D_k$. This
+is known as Alexander's dark band. Now we know exactly as function of the 
+impact paramenter $p$, the angle at which the rays will leave the drop, we call 
+$\Theta_k(\theta)$, in which the index $k$ represents how many internal 
+reflections the ray suffered. 
+
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{Pk.pdf}
+\caption{Deviation angles for the first and second rainbows}
+\label{fig:Pk}
+\end{figure}
+%-------------------------------------------------------------------------------
+\subsection{Intensities}
+%-------------------------------------------------------------------------------
+Using Fresnel Law, the intensity of reflected and transmitted light of TE 
+polarization can be
+written as:
+\begin{eqnarray}
+R_p &=& \dfrac{I_r}{I_i} = \dfrac{\sin^2 (\theta - \phi ) }
+{\sin^2 (\theta + \phi )} \label{intenfresnreflec} \\
+T_p &=& \dfrac{I_t}{I_i} =1 - R_{\perp} = 
+1-\dfrac{\sin^2(\theta-\phi)}{\sin^2(\theta+\phi)}\label{intefrestrans}
+\end{eqnarray}
+where the subscript $p$ means parallel. The primary bow is formed when the ray 
+suffers only one internal reflection inside the water droplet. In this case, 
+the ray suffers one refraction (entering the droplet), one internal reflection
+and one last refraction leaving the dropble. Likewise, the intensity of the 
+second ray will have the same two refractions but will have one more 
+reflection. Using eqs. \ref{intenfresnreflec} and \ref{intefrestrans} the 
+intensity of these rays will be:
+\begin{subequations}
+\label{eqsTp}
+\begin{equation}
+T_p^1 = T_p^2 R_p,\label{eqTp1}
+\end{equation}
+\begin{equation}
+T_p^2 = T_p^2 R_p^2.\label{eqTp2}
+\end{equation}
+\end{subequations}
+The angle of incidence in the internal reflection and in the second refraction 
+is $\theta_r$. 
+
+We can achieve an analog result for the TM polarization. The corresponding 
+Fresnel coefficients are:
+\begin{eqnarray}
+R_s &=& \dfrac{I_r}{I_i} = 
+\dfrac{\tan^2 (\theta - \phi ) }{\tan^2 (\theta + \phi )}
+\label{intenfresnreflecTM} \\
+T_s &=& \dfrac{I_t}{I_i} =1 - R_s =
+1-\dfrac{\tan^2 (\theta - \phi ) }{\tan^2 (\theta + \phi )}
+\label{intefrestransTM}
+\end{eqnarray}
+And the intensity of the first two rays will be
+\begin{subequations}
+\label{eqsTs}
+\begin{equation}
+T_s^1 = T_s^2 R_s,\label{eqTs1}
+\end{equation}
+\begin{equation}
+T_s^2 = T_s^2 R_s^2.\label{eqTs2}
+\end{equation}
+\end{subequations}
+
+The general case for $k$ internal reflections for the intensity as function of
+incoming angle $\theta$ and refraction angle $\phi(\theta)$ can be obtained 
+from eqs. \ref{eqsTp} and \ref{eqsTs}:
+\begin{eqnarray}
+T^p_k&=&
+\left[1-\left(\frac{\sin(\theta-\phi)}{\sin(\theta+\phi)\right)^2}\right]^2
+\left[\frac{\sin(\theta-\phi)}{\sin(\theta+\phi)}\right]^{2k}\\
+T^s_k&=&
+\left[1-\left(\frac{\tan(\theta-\phi)}{\tan(\theta+\phi)\right)^2}\right]^2
+       \left[\frac{\tan(\theta-\phi)}{\tan(\theta+\phi)}\right]^{2k}
+\end{eqnarray}
+where the subscript $p$ means \emph{parallel} and $s$ means \emph{orthogonal}
+(from german \emph{senkrecht}).
+This way we can see a first approach to the amplitude relations, as seen in
+figure~\ref{fig:Tpsk}.
+We can consider that the polarization is equally distributed, so we can make 
+$T_k=T^s_k+T^p_k$.
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{ReflectionCoeff.pdf}
+\caption{Polar plot of the transmission functions $T^s$ and $T_p$ for $k=1,2$, 
+as function
+of the respective output angle $\Theta_k$. In magenta we have delimited the 
+Alexander's dark
+zone.}
+\label{fig:Tpsk}
+\end{figure}
+%-------------------------------------------------------------------------------
+In figure~\ref{fig:Tpsk} we can see the contribution of both polarizations. 
+
+\subsection{Balancing}
+
+Another source of balancing in the amplitude is the geometrical balancing in 
+the the rays.
+We consider a set of rays reaching an circular area of radius $p+dp$ and an 
+angle $\phi+d\phi$.
+So the area of incidence will be 
+$dS_o=p dp d\phi=a^2\sin ^2\theta d\theta d\phi$.The emerging
+rays will form at a distance $r$ and an angle $\Theta_k$ a solid area element
+$dS_k=r^2\sin\Theta_k d\Theta_k d\phi$. Calculating the ratio of intensity 
+output by the input,
+we get (and also taking into account the reflection/refraction losses)
+\begin{equation}
+\frac{I_k}{I_o}
+=\frac{dS_o}{dS_k}
+=\frac{T_k}{2}\left(\frac{a^2}{r^2}\right)
+\frac{\sin 2\theta}{\sin\Theta_k}\left(\frac{d\Theta_k}{d\theta}\right)^{-1}
+\end{equation}
+At first we can observe that, as seen in figure~\ref{fig:Pk}, 
+$d\Theta_k/d\theta$ have a zero
+just a the limiting angles, which will make the values of $I_k/I_o$ go to 
+infinity, which is
+much more then the values of intensity in the neighborhood. This is the main 
+cause of the
+rainbow. 
+
+Just for curiosity, let's plot the functions $S_k=\sin 2\theta/\sin\Theta_k$ 
+as function of
+$\Theta_k$, and the values of $T_kS_k$.
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{S12.pdf}
+\caption{Polar plot of the angle function $S^k$ as function of the respective
+output angle $\Theta_k$. In magenta we have delimited the Alexander's dark
+zone.}
+\label{fig:S12}
+\end{figure}
+%------------------------------------------------------------------------------
+As we can see in figure~\ref{fig:S12}, the function $S_k$ is a well behavoired 
+function, except
+at points $\theta=j\pi$, $j=0,1,\ldots$, where $\sin\Theta_k(\theta)$ vanishes.
+So, for numerical 
+calculations we have to know the limiting values, as shown in 
+appendix~\ref{app:lim}. Now, its
+just \emph{multiply} one function to the oder, as is shown in 
+figure~\ref{fig:St12}. This is
+the almost final picture, and it's very similar to figure~\ref{fig:Tpsk}. 
+We can see comparing
+the two pictures is that the secondary rainbow $k=2$ have much smaller intensity
+than $k=1$.
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{ST12.pdf}
+\caption{Polar plot of the transmission functions $S_kT^s_k$ and $T^p_k$ for 
+$k=1,2$, as function
+of the respective output angle $\Theta_k$. In magenta we have delimited the 
+Alexander's dark
+zone.}
+\label{fig:St12}
+\end{figure}
+%-------------------------------------------------------------------------------
+This way we can see that the most important thing to take in acount is the angle
+of mininum
+deviation, so to say, that one which makes $d\Theta_k/d\theta=0$. We call this 
+angle by Cartesian
+angle $\theta_k^*$, and the minimum deviation we call $\Theta_k^*$.
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{Intensity.pdf}
+\caption{Final intensity as function of the output angle in log scale.}
+\label{fig:Intsty}
+\end{figure}
+%-------------------------------------------------------------------------------
+Now that we know that the rainbow will occur at the Cartesian angle, we have to
+explain how the
+colors separate. The separation is due to the dispersion, i.e., the variation of
+the index of
+refraction with the wavelength.To do this we use the relationship of 
+$\theta_k^*$ given and calculate
+the derivative, obtaining
+\begin{equation}
+\frac{d\Theta_k}{d\lambda}=\frac{d\Theta_k}{dn}\frac{dn}{d\lambda}
+\end{equation}
+where 
+\begin{equation}
+\frac{d\Theta_k}{dn}=\frac{2(k+1)\sin\theta}{n^2\sqrt{n^2-\sin^2\theta}}
+\end{equation}
+Now, we can see the efect on the Cartesian angle, 
+\begin{equation}
+\frac{d\Theta_k^*}{dn}=\frac{2}{n}\sqrt{\frac{(k+1)^2}{n^2-1}}
+\end{equation}
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{PFT.pdf}
+\caption{Polar plot of the final intensity as function of the output angle.}
+\label{fig:pft}
+\end{figure}
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+\begin{figure}
+\centering
+\includegraphics[width=2.9 in]{PFZ.pdf}
+\caption{Polar plot zoomed of the intensity. We can see some intensities out of
+the Cartesian
+angle (the one that gives the minimum deviation).}
+\label{fig:pfz}
+\end{figure}
+
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------
+\appendix\label{app:lim}
+%-------------------------------------------------------------------------------
+\section{Calculating the Cartesian angles}
+%-------------------------------------------------------------------------------
+Let's calculate the derivative of the function 
+$f(\theta)=j\theta+(k+1)(\pi-2\phi)$, where
+$n\sin\phi=\sin\theta$. The derivative as function of $j$ permits to use it to 
+calculate the
+derivative of $D_k$, $\Theta_k$ ($j=2$) and $\Phi_k$ ($j=1$). We can see that 
+$f'(\theta)=j-2(k+1)\phi'(\theta)$. So, we can obtain the value
+\begin{equation}
+\frac{d\phi}{d\theta}=\frac{j}{2(k+1)}
+\end{equation}
+To calculate $\phi'(\theta)$ we can also calculate the derivative of both sides 
+of $n\sin\phi=\sin\theta$.
+We get
+\begin{equation}
+n\cos\phi\frac{d\phi}{d\theta}=\cos\theta
+\end{equation}
+that we can be manipulated to obtain
+\begin{equation}
+\frac{d\phi}{d\theta}
+=\frac{\cos\theta}{n\cos\phi}=\frac{1}{u}
+%=\sqrt{\frac{1-\sin^2\theta}{n^2-\sin^2\theta}}
+%=\sqrt{\frac{\cos^2\theta}{n^2-1+\cos^2\theta}}
+\end{equation}
+To solve the above equation we call $u=2(k+1)/j$,  then use the Snell law and 
+obtain 
+%\begin{equation}
+%\sqrt{\frac{1-\sin^2\theta}{n^2-\sin^2\theta}}=\frac{j}{2(k+1)}.
+%\end{equation}
+%we obtain for this case
+\begin{equation}
+\sin\theta=\sqrt{\frac{u^2-n^2}{u^2-1}}
+\end{equation}
+%The other answer is for the case
+%\begin{equation}
+%\sqrt{\frac{\cos^2\theta}{n^2-1+\cos^2\theta}}=\frac{j}{2(k+1)}
+%\end{equation}
+%which give the value
+or also
+\begin{equation}
+\cos\theta=\sqrt{\frac{n^2-1}{u^2-1}}.
+\end{equation}
+We can chech that $\sin^2\theta+\cos^2\theta=1$. The most common case, we want
+to know the value of the Cartesian angle ($\Theta_k^*$), so $j=2$, and for
+the case $k=1$
+%-------------------------------------------------------------------------------
+\section{Calculating the limit values}
+%-------------------------------------------------------------------------------
+Let's start showing that 
+\begin{eqnarray}
+\sin(\theta+n\phi)&=&(-1)^n\sin\theta\\
+\cos(\theta+n\phi)&=&(-1)^n\cos\theta
+\end{eqnarray}
+Let's calculate the values of $\phi$ at points $\theta=j\pi$.  The first order 
+expansion we have for
+\begin{eqnarray}
+\Big.\sin x\Big|_{x\to j\pi} &\approx& (-1)^j(x-j\pi)\\
+\Big.\cos x\Big|_{x\to j\pi} &\approx& (-1)^j.
+\end{eqnarray}
+Now it's easy to see that
+\begin{equation}
+\sin 2\theta=2\sin\theta\cos\theta\approx 2(\theta-j\pi).
+\end{equation}
+We have to calculate the value of $\sin\Theta_k$ for the values of 
+$\theta=j\pi$.
+So, at $x=j\pi$ we have that $\sin x = 0$, which says that
+\begin{equation}
+\Big.\arcsin x\Big|_{x\to0} \approx x
+\end{equation}
+So, we have that 
+\begin{equation}
+\phi=\arcsin\left\{\frac{\sin\theta}{n}\right\}
+\end{equation}
+will give us
+\begin{equation}
+\phi(\theta\to j\pi)=(-1)^j\frac{(\theta-j\pi)}{n}
+\end{equation}
+We know that $\Theta_k=2\theta+(k+1)(\pi-2\phi)$,
+so, at the extremes we have $\Theta_k=2(\theta-(k+1)\phi)+(k+1)\pi$.
+Now, we have to calculate $\sin\Theta_k=(-1)^{(k+1)}\sin 2(\theta-(k+1)\phi)$.
+Doing
+\begin{equation}
+\theta-(k+1)\phi
+%=\theta-(k+1)(-1)^j\frac{(\theta-j\pi)}{n}
+%=(\theta-j\pi)-(k+1)(-1)^j\frac{(\theta-j\pi)}{n}+j\pi
+=(\theta-j\pi)\left(1-\frac{(k+1)(-1)^j}{n}\right)+j\pi
+\end{equation}
+we can see that
+\begin{equation}
+\sin\Theta_k
+%=(-1)^{(k+j+1)}\sin 2(\theta-j\pi)\left(1-\frac{(k+1)(-1)^j}{n}\right)
+\approx (-1)^{(k+j+1)}2(\theta-j\pi)\left(1-\frac{(k+1)(-1)^j}{n}\right)
+\end{equation}
+which give us that
+\begin{equation}
+\left.\frac{\sin 2\theta}{\sin\Theta_k}\right|_{\theta\to j\pi}
+=\frac{(-1)^{k+1}}{(-1)^j-(k+1)/n}
+\end{equation}
+
+
+
+
+
+
+
+%-------------------------------------------------------------------------------
+\end{document}
+%-------------------------------------------------------------------------------
